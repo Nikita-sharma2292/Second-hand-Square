@@ -17,3 +17,9 @@ Buyers can contact sellers or proceed with a product purchase.
 
 ## Responsive Design:
 A seamless user experience across devices, including desktop and mobile.
+
+## JWT
+This project uses Json-Web-Token for authentication and authorization.
+
+## React-redux-toolkit
+This project uses Redux-toolkit for state management.
