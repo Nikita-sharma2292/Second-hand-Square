@@ -23,3 +23,6 @@ This project uses Json-Web-Token for authentication and authorization.
 
 ## React-redux-toolkit
 This project uses Redux-toolkit for state management.
+
+## User Profile management
+It provides functionality of updating profile, changing password, viewing adds and deleting uploaded adds.
