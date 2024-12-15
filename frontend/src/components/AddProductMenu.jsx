@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useRef } from "react";
 import SubMenu from "./SubMenu";
 import { motion } from "framer-motion";
+import Header from "./Header";
+import SubHeader from "./SubHeader";
 
 // * React icons
 import { IoIosArrowBack } from "react-icons/io";
@@ -20,7 +22,6 @@ import { MdOutlineCardTravel } from "react-icons/md";
 import { useMediaQuery } from "react-responsive";
 import { MdMenu } from "react-icons/md";
 import { NavLink, useLocation, useRoutes } from "react-router-dom";
-import Header from "./Header";
 
 const AddProductMenu = () => {
   let isTabletMid = useMediaQuery({ query: "(max-width: 768px)" });
@@ -129,15 +130,13 @@ const AddProductMenu = () => {
       icon: MdOutlinePets,
       menus: ["Fishes and Aquarium", "Pet Food and Accessories", "Dogs", "Other Pets"],
     },
-    {
-      name: "Services",
-      icon: MdOutlineCardTravel,
-      menus: ["Education and Classes", "Tour and Travel", "Electronics Repair and Services", "Health and Beauty", "Home Renovation and Repair", "Cleaning and Pest Control", "Legal and Documentation Services", "Packer and Movers", "Other"],
-    },
   ];
 
   return (
     <div>
+      {/* <Header />
+      <SubHeader /> */}
+      <div>
         <motion.div
           ref={sidebarRef}
           variants={Nav_animation}
@@ -191,6 +190,7 @@ const AddProductMenu = () => {
           <MdMenu size={25} />
         </div>
       </div>
+    </div>
   );
 };
 

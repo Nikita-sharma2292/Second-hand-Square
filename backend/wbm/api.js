@@ -50,8 +50,6 @@ async function start({ showBrowser = false, qrCodeData = false, session = true }
         }
         else {
             if (qrCodeData) {
-                console.log('Getting QRCode data...');
-                console.log('Note: You should use wbm.waitQRCode() inside wbm.start() to avoid errors.');
                 return await getQRCodeData();
             } else {
                 await generateQRCode();
@@ -68,7 +66,6 @@ async function start({ showBrowser = false, qrCodeData = false, session = true }
  * Check if needs to scan qr code or already is is inside the chat
  */
 function isAuthenticated() {
-    console.log('Authenticating...');
     return merge(needsToScan(page), isInsideChat(page))
         .pipe(take(1))
         .toPromise();
@@ -113,10 +110,8 @@ async function getQRCodeData() {
  */
 async function generateQRCode() {
     try {
-        console.log("generating QRCode...");
         const qrcodeData = await getQRCodeData();
         qrcode.generate(qrcodeData, { small: true });
-        console.log("QRCode generated! Scan it using Whatsapp App.");
     } catch (err) {
         throw await QRCodeExeption("QR Code can't be generated(maybe your connection is too slow).");
     }
@@ -204,7 +199,6 @@ function generateCustomMessage(contact, messagePrototype) {
  */
 async function end() {
     await browser.close();
-    console.log(`Result: ${counter.success} sent, ${counter.fails} failed`);
 }
 
 module.exports = {

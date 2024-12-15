@@ -1,123 +1,130 @@
 import { useEffect, useState } from "react";
 import Header from "./Header";
-import {useParams, useNavigate } from "react-router-dom";
-import ProductList from "./ProductList";
-import axios from "axios";
+import { useParams, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { categoryProducts, resetProducts } from "../features/productSlice";
+import { toast } from "react-toastify";
+import { addToCart, reset } from "../features/authSlice";
 import SubHeader from "./SubHeader";
+import CarFilters from "./Filters/CarsFilters";
+import PetsFilters from "./Filters/PetsFilters";
+import BooksFilters from "./Filters/BooksFilters";
+import FashionFilters from "./Filters/FashionFilters";
+import FurnitureFilters from "./Filters/FurnitureFilters"; 
+import VehiclesFilters from "./Filters/VehiclesFilters";
+import ElectronicsFilters from "./Filters/ElectronicsFilters";
+import BikesFilters from "./Filters/BikesFilters";
+import JobsFilters from "./Filters/JobsFilters";
+import MobilesFilters from "./Filters/MobilesFilters";
+import PropertiesFilters from "./Filters/PropertiesFilters";
 
-function CategoryList () {
+function CategoryList() {
+    const [allproducts, setProducts] = useState([]);
+    const { category } = useParams();
+    const { subCategory } = useParams();
+
+    const dispatch = useDispatch();
     const navigate = useNavigate();
-    const p = useParams();
-    const category = p.category; 
 
-    const [products, setProducts] = useState([]);
-    const [search, setSearch] = useState("");
-    const [filtered, setFiltered] = useState([]);
-    const [isFiltered, setIsFiltered] = useState(false);
+    const { isError, message, isSuccess, products, isSearched, searchedProducts, isFiltered, filteredProducts } = useSelector(state => state.products);
+    const { cart, isCart } = useSelector(state => state.auth);
+    const isCartError = useSelector(state => state.auth.isError);
+    const cartMessage = useSelector(state => state.auth.message);
 
     useEffect(() => {
-        if(!localStorage.getItem('token')) {
-            navigate('/login');
+        dispatch(categoryProducts({ category, subCategory }));
+    }, [category, subCategory])
+
+    useEffect(() => {
+        if (isError || isCartError) {
+            toast.error(message);
         }
-    }, [])
 
-    useEffect(() => {
-        const url='http://localhost:4000/get-products'
-        axios.get(url)
-        .then((res) => {
-            if(res.data.products)
-                setProducts(res.data.products)
-        })
-        .catch((err) => {
-            alert('server error');
-        })
-    }, [])
+        if (isCart) {
+            toast.success(cartMessage);
+            dispatch(reset());
+        }
 
-    useEffect(() => {
-        console.log(category)
-        let filteredProducts = products.filter((item) => {
-            if(item.SubCategory.includes(category))
-                return item;
-        })
-        setFiltered(filteredProducts);
-        setIsFiltered(true);
-        
-        console.log(filteredProducts);
-    },[products, category])
+        if (isSuccess) {
+            if (isSearched) {
+                if (searchedProducts.length == 0) toast.error("No such item exists");
+                else setProducts(searchedProducts);
+            }
+            else if (isFiltered) {
+                if (filteredProducts.length == 0) toast.error("No such item exists");
+                else setProducts(filteredProducts);
+            }
+            else {
+                setProducts(products);
+            }
+        }
 
-    const handlesearch = (value) => {
-        console.log(value);
-        setSearch(value);
-    }
+        dispatch(resetProducts());
+    }, [isError, isSuccess, message, products, navigate, dispatch, cart, isCart, allproducts])
 
-    const handleClick = () => {
-        console.log(products)
-        console.log(search)
-        let filteredProducts = products.filter((item) => {
-            if(item.Brand?.toLowerCase().includes(search.toLowerCase()) 
-                || item.Title?.toLowerCase().includes(search.toLowerCase()) || item.Description?.toLowerCase().includes(search.toLowerCase())
-                || item.Category?.toLowerCase().includes(search.toLowerCase()) || item.SubCategory?.toLowerCase().includes(search.toLowerCase()) || item.Price?.toLowerCase().includes(search.toLowerCase()))
-                return item;
-        })
-        setFiltered(filteredProducts);
-        console.log(filtered);
-        setIsFiltered(true);
-    }
+    const filterComponents = {
+        Cars: CarFilters,
+        Pets: PetsFilters,
+        Books: BooksFilters,
+        Fashion: FashionFilters,
+        Furniture: FurnitureFilters,
+        "Electronics and Appliances": ElectronicsFilters,
+        "Commercial Vehicals": VehiclesFilters,
+        Bikes: BikesFilters,
+        Jobs: JobsFilters,
+        Mobiles: MobilesFilters,
+        Properties: PropertiesFilters,
+    };
 
-    const handleCategory = (category) => {
-        navigate('/CategoryList/'+category);
-    }
-
-    const handleCart = (productId) => {
-        let userId = localStorage.getItem('userId')
-        console.log('userid', 'productid', productId, userId)
-        const url='http://localhost:4000/Cart'
-        const data={userId, productId}
-        axios.put(url, data)
-        .then((res) => {
-            if(res.data.message)
-                alert('liked')
-        })
-        .catch((err) => {
-            alert('server error');
-        })
-    }
-
-    const handleProduct = (id) => {
-        navigate('/ProductDetail/'+id)
-    }
-
-    const handleFilter = (data) => {
-        console.log(data.KM);
-        
-        let filteredProducts = products.filter((item) => {
-            if((item.Category == 'Cars'))
-                if(((2024-item.Year?.toLowerCase()) <= data.Year[0]?.toLowerCase()) || (item.Price?.toLowerCase() <= data.Price[0]?.toLowerCase()) ||
-                   (data.Brand.includes(item.Brand)) || (data.Transmission.includes(item.Transmission)) || ((data.Owners.includes(item.Owners))) ||
-                   (data.Fuel.includes(item.Fuel)) || (item.KM?.toLowerCase() <= data.KM[0]?.toLowerCase()))
-                return item;
-        }) 
-
-        setFiltered(filteredProducts);
-        console.log(filtered);
-        setIsFiltered(true);
-        // navigate('/');
-    }
+    const FilterComponent = filterComponents[category] || null;
 
     return (
         <div className="flex flex-col">
             <div>
-                <Header search={search} handlesearch={handlesearch} handleClick={handleClick}/>
+                <Header />
             </div>
             <div>
-                <SubHeader handleCategory={handleCategory}/>
+                <SubHeader />
             </div>
-            {/* <div className="flex flex-row bg-gray-200">
-            <div className="border border-black w-[30%] mt-10 mb-10 ml-8 rounded-2xl bg-white"><div><CarsFilters /></div></div> */}
-            <div className="bg-gray-200 h-screen">
-                <ProductList handleFilter={handleFilter} products={products} filteredProducts={filtered} isFiltered={isFiltered} handleCart={handleCart} handleProduct={handleProduct}/>
+            <div className="bg-gray-200 h-cover">
+                <div className="flex flex-row">
+                    {FilterComponent && <FilterComponent category={category} subCategory={subCategory} />}
+                    <section
+                        class="w-5/6 pl-12 mr-8 mx-screen grid grid-cols-1 lg:grid-cols-4 md:grid-cols-2 justify-items-center justify-center gap-y-8 mt-10 mb-5">
+
+                        {allproducts && allproducts.length > 0 &&
+                            allproducts.map((item) => {
+
+                                return (
+                                    <div key={item._id} onClick={() => navigate(`/ProductDetail/${item._id}`)} class="w-60 h-96 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl">
+                                        <div>
+                                            <img src={item.Images[0]}
+                                                alt="Product" class="h-60 w-60 object-cover rounded-t-xl" />
+                                        </div>
+                                        <div class="px-4 py-3 w-60">
+                                            <span class="text-gray-400 mr-3 uppercase text-xs">{item.category} | {item.subCategory}</span>
+                                            <p class="text-md mt-3 font-bold text-black truncate block capitalize">{item.Title}</p>
+                                            <div class="flex items-center">
+                                                <p class="text-lg font-semibold text-black cursor-auto my-3">{item.Price}</p>
+
+                                                <div class="ml-auto" onClick={() => dispatch(addToCart({ 'id': item._id }))}>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                                        fill="currentColor" class="bi bi-bag-plus" viewBox="0 0 16 16">
+                                                        <path fill-rule="evenodd"
+                                                            d="M8 7.5a.5.5 0 0 1 .5.5v1.5H10a.5.5 0 0 1 0 1H8.5V12a.5.5 0 0 1-1 0v-1.5H6a.5.5 0 0 1 0-1h1.5V8a.5.5 0 0 1 .5-.5z" />
+                                                        <path
+                                                            d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1zm3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4h-3.5zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5z" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )
+
+                            })}
+                    </section>
+                </div>
             </div>
-            {/* </div> */}
         </div>
     );
 }

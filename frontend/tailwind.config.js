@@ -4,7 +4,12 @@ module.exports = {
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        purple: '#4B086D',
+        lilac: '#ACC0FE',
+      },
+    },
   },
   plugins: [require("tailwind-scrollbar", "@tailwindcss/forms")],
 }

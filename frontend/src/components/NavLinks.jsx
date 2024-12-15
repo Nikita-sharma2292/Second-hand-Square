@@ -1,8 +1,11 @@
 import React, { useState } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const NavLinks = ({handleCategory}) => {
   const [heading, setHeading] = useState("");
   const [subHeading, setSubHeading] = useState("");
+
+  const navigate = useNavigate();
 
   const links = [
     {
@@ -26,7 +29,7 @@ const NavLinks = ({handleCategory}) => {
       menus: ["Motorcycles", "Scooters", "Spare Parts", "Bicycles"],
     },
     {
-      name: "Electronics",
+      name: "Electronics and Appliances",
       menus: ["Tvs Video and Audio", "Kitchen and Other Appliances", "Computers and Laptops", "Cameras and Lenses", "Games and Entertainment", "Fridges", "Computer Accessories", "Hard Disks, Printers and Monitors", "ACs", "Washing Machines"],
     },
     {
@@ -49,35 +52,21 @@ const NavLinks = ({handleCategory}) => {
       name: "Pets",
       menus: ["Fishes and Aquarium", "Pet Food and Accessories", "Dogs", "Other Pets"],
     },
-    {
-      name: "Services",
-      menus: ["Education and Classes", "Tour and Travel", "Electronics Repair and Services", "Health and Beauty", "Home Renovation and Repair", "Cleaning and Pest Control", "Legal and Documentation Services", "Packer and Movers", "Other"],
-    },
   ];
 
   return (
     <>
       {links.map((link) => (
         <div>
-          <div className="px-3 text-m flex flex-row gap-1-px text-left md:cursor-pointer group">
+          <div className="px-3 font-sans text-s flex flex-row gap-1-px text-left md:cursor-pointer group">
             <h1
-              className="py-5 flex justify-between items-center md:pr-0 group"
+              className="py-5 flex font-normal justify-between items-center group"
               onClick={() => {
                 heading !== link.name ? setHeading(link.name) : setHeading("");
                 setSubHeading("");
               }}
             >
               {link.name}
-              <span className="text-xl md:hidden inline">
-                <ion-icon
-                  name={`${
-                    heading === link.name ? "chevron-up" : "chevron-down"
-                  }`}
-                ></ion-icon>
-              </span>
-              <span className="text-xl md:mt-1 md:ml-2  md:block hidden group-hover:rotate-180 group-hover:-mt-2">
-                <ion-icon name="chevron-down"></ion-icon>
-              </span>
             </h1>
             {link.menus && (
               <div>
@@ -87,13 +76,13 @@ const NavLinks = ({handleCategory}) => {
                       className="w-4 h-4 mt-1 bg-slate-800 rotate-30"
                     ></div>
                   </div>
-                  <div className="bg-slate-800 text-white p-5 grid grid-cols-2 gap-8">
+                  <div className="bg-slate-800 text-white p-3 grid grid-cols-2 gap-1">
                     {link.menus.map((menuItem) => (
                       <div>
-                          <li className="text-sm text-white my-2.5">
+                          <li className="text-sm font-normal text-white my-3 mx-3">
                             <button
                               className="hover:text-primary"
-                              onClick={() => handleCategory && handleCategory({menuItem})}
+                              onClick={() => navigate(`/CategoryList/${link.name}/${menuItem}`)}
                             >
                               {menuItem}
                             </button>
@@ -104,48 +93,6 @@ const NavLinks = ({handleCategory}) => {
                 </div>
               </div>
             )}
-          </div>
-          {/* Mobile menus */}
-          <div
-            className={`
-            ${heading === link.name ? "md:hidden" : "hidden"}
-          `}
-          >
-              <div>
-                <div>
-                  <h1
-                    onClick={() =>
-                      subHeading !== link.name
-                        ? setSubHeading(link.name)
-                        : setSubHeading("")
-                    }
-                    className="py-4 pl-7 font-semibold md:pr-0 pr-5 flex justify-between items-center md:pr-0 pr-5"
-                  >
-                    {link.name}
-
-                    <span className="text-xl md:mt-1 md:ml-2 inline">
-                      <ion-icon
-                        name={`${
-                          subHeading === link.name
-                            ? "chevron-up"
-                            : "chevron-down"
-                        }`}
-                      ></ion-icon>
-                    </span>
-                  </h1>
-                  <div
-                    className={`${
-                      subHeading === link.name ? "md:hidden" : "hidden"
-                    }`}
-                  >
-                    {link.menus.map((slink) => (
-                      <li className="py-3 pl-14">
-                        <button onClick={() => handleCategory && handleCategory({slink})}>{slink}</button>
-                      </li>
-                    ))}
-                  </div>
-                </div>
-              </div>
           </div>
         </div>
       ))}
